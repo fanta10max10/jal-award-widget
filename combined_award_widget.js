@@ -147,6 +147,7 @@ if (family === "accessoryInline") {
 
 } else {
   // ホーム画面 small / medium / large
+  // JAL左・ANA右の2カラム構成。ボタンは各カラムの底に配置。
   widget.backgroundColor = new Color("#0d1117");
   widget.setPadding(14, 14, 14, 14);
 
@@ -154,64 +155,68 @@ if (family === "accessoryInline") {
   titleEl.font = Font.boldSystemFont(11);
   titleEl.textColor = new Color("#888888");
 
-  widget.addSpacer(10);
+  widget.addSpacer(8);
 
-  // JAL
-  const jalLabelEl = widget.addText(`✈ JAL  360日先  ${JAL_TIME}スタート`);
+  // ── 2カラム（左: JAL / 右: ANA）──────────────────────
+  const mainRow = widget.addStack();
+  mainRow.layoutHorizontally();
+
+  // ── JAL カラム（左寄せ）────────────────────────────
+  const jalCol = mainRow.addStack();
+  jalCol.layoutVertically();
+
+  const jalLabelEl = jalCol.addText(`✈ JAL  360日先  ${JAL_TIME}`);
   jalLabelEl.font = Font.systemFont(9);
   jalLabelEl.textColor = new Color(JAL_COLOR);
 
-  const jalDateEl = widget.addText(fmt(jalDate));
+  const jalDateEl = jalCol.addText(fmt(jalDate));
   jalDateEl.font = Font.boldSystemFont(17);
   jalDateEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
 
   if (jalPeak) {
-    const p = widget.addText(`🔥 ${jalPeak}期間 ― 即完売注意`);
+    const p = jalCol.addText(`🔥 ${jalPeak} 即完売注意`);
     p.font = Font.boldSystemFont(9);
     p.textColor = new Color(PEAK_COLOR);
   }
 
-  widget.addSpacer(8);
+  jalCol.addSpacer();  // ボタンを底に押し下げ
 
-  // ANA
-  const anaLabelEl = widget.addText(`✈ ANA  355日先  ${ANA_TIME_DOMESTIC}スタート（国内）`);
-  anaLabelEl.font = Font.systemFont(9);
-  anaLabelEl.textColor = new Color(ANA_COLOR);
-
-  const anaDateEl = widget.addText(fmt(anaDate));
-  anaDateEl.font = Font.boldSystemFont(17);
-  anaDateEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
-
-  if (anaPeak) {
-    const p = widget.addText(`🔥 ${anaPeak}期間 ― 即完売注意`);
-    p.font = Font.boldSystemFont(9);
-    p.textColor = new Color(PEAK_COLOR);
-  }
-
-  widget.addSpacer();
-
-  // ボタン横並び
-  const btnRow = widget.addStack();
-  btnRow.layoutHorizontally();
-
-  const jalBtn = btnRow.addStack();
+  const jalBtn = jalCol.addStack();
   jalBtn.url = JAL_URL;
   jalBtn.backgroundColor = new Color(JAL_COLOR);
   jalBtn.cornerRadius = 6;
   jalBtn.setPadding(5, 10, 5, 10);
-  jalBtn.centerAlignContent();
   const jalBtnText = jalBtn.addText("✈ JAL予約");
   jalBtnText.font = Font.boldSystemFont(10);
   jalBtnText.textColor = Color.white();
 
-  btnRow.addSpacer(8);
+  mainRow.addSpacer(12);  // カラム間スペース
 
-  const anaBtn = btnRow.addStack();
+  // ── ANA カラム（右寄せ）────────────────────────────
+  const anaCol = mainRow.addStack();
+  anaCol.layoutVertically();
+
+  const anaLabelEl = anaCol.addText(`✈ ANA  355日先  ${ANA_TIME_DOMESTIC}`);
+  anaLabelEl.font = Font.systemFont(9);
+  anaLabelEl.textColor = new Color(ANA_COLOR);
+
+  const anaDateEl = anaCol.addText(fmt(anaDate));
+  anaDateEl.font = Font.boldSystemFont(17);
+  anaDateEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
+
+  if (anaPeak) {
+    const p = anaCol.addText(`🔥 ${anaPeak} 即完売注意`);
+    p.font = Font.boldSystemFont(9);
+    p.textColor = new Color(PEAK_COLOR);
+  }
+
+  anaCol.addSpacer();  // ボタンを底に押し下げ
+
+  const anaBtn = anaCol.addStack();
   anaBtn.url = ANA_URL;
   anaBtn.backgroundColor = new Color(ANA_COLOR);
   anaBtn.cornerRadius = 6;
   anaBtn.setPadding(5, 10, 5, 10);
-  anaBtn.centerAlignContent();
   const anaBtnText = anaBtn.addText("✈ ANA予約");
   anaBtnText.font = Font.boldSystemFont(10);
   anaBtnText.textColor = Color.white();
