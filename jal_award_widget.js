@@ -31,19 +31,17 @@ function addDays(date, days) {
   return d;
 }
 
-/** YYYY/MM/DD（曜） */
+/** YY/M/D（曜） */
 function fmtFull(d) {
-  const y   = d.getUTCFullYear();
-  const m   = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${y}/${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
+  const yy  = String(d.getUTCFullYear()).slice(-2);
+  const m   = d.getUTCMonth() + 1;
+  const day = d.getUTCDate();
+  return `${yy}/${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
 }
 
-/** MM/DD（曜）―年なし */
+/** YY/M/D（曜）―ロック画面向け（fmtFullと同形式） */
 function fmtMD(d) {
-  const m   = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
+  return fmtFull(d);
 }
 
 /** M/D（曜）―最短 */
