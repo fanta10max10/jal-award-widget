@@ -32,6 +32,7 @@ function peakSeasonName(d) {
   if ((m === 12 && day >= 28) || (m === 1 && day <= 4)) return "年末年始";
   if ((m === 4 && day >= 29)  || (m === 5 && day <= 6)) return "GW";
   if (m === 8 && day >= 10 && day <= 18)                return "お盆";
+  if (m === 9 && day >= 19 && day <= 23)                return "シルバーウィーク";
   return null;
 }
 
