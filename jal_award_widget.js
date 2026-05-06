@@ -127,7 +127,7 @@ if (family === "accessoryInline") {
 
   // 繁忙期バッジ
   if (peak) {
-    const peakEl = widget.addText(`🔥 ${peak}期間 ― 即完売注意`);
+    const peakEl = widget.addText(`🔥 ${peak}期間`);
     peakEl.font = Font.boldSystemFont(10);
     peakEl.textColor = new Color(PEAK_COLOR);
     widget.addSpacer(2);

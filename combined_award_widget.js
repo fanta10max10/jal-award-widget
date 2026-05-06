@@ -191,13 +191,13 @@ if (family === "accessoryInline") {
     const peakRow = widget.addStack();
     peakRow.layoutHorizontally();
     if (jalPeak) {
-      const p = peakRow.addText(`🔥 ${jalPeak} 即完売`);
+      const p = peakRow.addText(`🔥 ${jalPeak}期間`);
       p.font = Font.boldSystemFont(10);
       p.textColor = new Color(PEAK_COLOR);
     }
     peakRow.addSpacer();
     if (anaPeak) {
-      const p = peakRow.addText(`🔥 ${anaPeak} 即完売`);
+      const p = peakRow.addText(`🔥 ${anaPeak}期間`);
       p.font = Font.boldSystemFont(10);
       p.textColor = new Color(PEAK_COLOR);
       p.rightAlignText();
