@@ -94,21 +94,18 @@ if (family === "accessoryInline") {
   widget.addSpacer();
 
 } else if (family === "accessoryRectangular") {
-  // ラベルと日付を同一行に
-  const row = widget.addStack();
-  row.layoutHorizontally();
-  row.centerAlignContent();
-  const lblEl = row.addText(LABEL + "  ");
+  // 半幅配置対応: ラベル→日付→時刻の3行構成
+  const lblEl = widget.addText(LABEL);
   lblEl.font = Font.systemFont(10);
-  const dtEl = row.addText(fmtMD(target));
-  dtEl.font = Font.boldSystemFont(13);
 
-  // 繁忙期なら🔥を追記
+  const dtEl = widget.addText(fmtMD(target));
+  dtEl.font = Font.boldSystemFont(15);
+
   const timeStr = peak
-    ? `国内 ${START_TIME_DOMESTIC} / 国際 ${START_TIME_INTL} 予約開始  🔥 ${peak}`
+    ? `国内 ${START_TIME_DOMESTIC} / 国際 ${START_TIME_INTL}  🔥 ${peak}`
     : `国内 ${START_TIME_DOMESTIC} / 国際 ${START_TIME_INTL} 予約開始`;
   const timeEl = widget.addText(timeStr);
-  timeEl.font = Font.systemFont(10);
+  timeEl.font = Font.systemFont(9);
   timeEl.textOpacity = 0.65;
 
 } else {
