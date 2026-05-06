@@ -149,7 +149,7 @@ if (family === "accessoryInline") {
   // ホーム画面 small / medium / large
   // JAL・ANA を色付きカードに分けて横並び
   widget.backgroundColor = new Color("#080810");
-  widget.setPadding(10, 10, 10, 10);
+  widget.setPadding(10, 0, 10, 0);
 
   const cards = widget.addStack();
   cards.layoutHorizontally();
@@ -198,7 +198,7 @@ if (family === "accessoryInline") {
     p.textColor = new Color(PEAK_COLOR);
   }
 
-  jalCard.addSpacer(8);
+  jalCard.addSpacer();
 
   addBtn(jalCard, "✈ 予約", new Color(JAL_COLOR), JAL_URL);
 
@@ -235,7 +235,7 @@ if (family === "accessoryInline") {
     p.textColor = new Color(PEAK_COLOR);
   }
 
-  anaCard.addSpacer(8);
+  anaCard.addSpacer();
 
   addBtn(anaCard, "✈ 予約", new Color(ANA_COLOR), ANA_URL);
 }
