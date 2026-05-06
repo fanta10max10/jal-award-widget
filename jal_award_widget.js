@@ -16,6 +16,24 @@ const APP_URL = "https://apps.apple.com/jp/app/jal/id351785536";
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
+// 繁忙期定義（月/日ベース・毎年共通）
+const PEAK_COLOR = "#ff8c00";  // 繁忙期オレンジ
+
+/**
+ * 日付が繁忙期に該当する場合にその名称を返す。該当なしは null。
+ * - 年末年始: 12/28 〜 1/4
+ * - GW:       4/29 〜 5/6
+ * - お盆:     8/10 〜 8/18
+ */
+function peakSeasonName(d) {
+  const m   = d.getUTCMonth() + 1;
+  const day = d.getUTCDate();
+  if ((m === 12 && day >= 28) || (m === 1 && day <= 4)) return "年末年始";
+  if ((m === 4 && day >= 29)  || (m === 5 && day <= 6)) return "GW";
+  if (m === 8 && day >= 10 && day <= 18)                return "お盆";
+  return null;
+}
+
 // ── 日付ユーティリティ ────────────────────────────────────
 
 function todayJST() {
@@ -52,6 +70,7 @@ function fmtShort(d) {
 // ── メイン処理 ────────────────────────────────────────────
 
 const target = addDays(todayJST(), OFFSET_DAYS);
+const peak   = peakSeasonName(target);  // 繁忙期名（なければ null）
 const family = config.widgetFamily;
 
 const widget = new ListWidget();
@@ -82,7 +101,11 @@ if (family === "accessoryInline") {
   const dtEl = row.addText(fmtMD(target));
   dtEl.font = Font.boldSystemFont(13);
 
-  const timeEl = widget.addText(`${START_TIME} 予約開始`);
+  // 繁忙期なら🔥を追記
+  const timeStr = peak
+    ? `${START_TIME} 予約開始  🔥 ${peak}`
+    : `${START_TIME} 予約開始`;
+  const timeEl = widget.addText(timeStr);
   timeEl.font = Font.systemFont(10);
   timeEl.textOpacity = 0.65;
 
@@ -97,11 +120,20 @@ if (family === "accessoryInline") {
 
   widget.addSpacer(8);
 
+  // 繁忙期なら日付をオレンジ・通常は白
   const dtEl = widget.addText(fmtFull(target));
   dtEl.font = Font.boldSystemFont(18);
-  dtEl.textColor = Color.white();
+  dtEl.textColor = peak ? new Color(PEAK_COLOR) : Color.white();
 
   widget.addSpacer(4);
+
+  // 繁忙期バッジ
+  if (peak) {
+    const peakEl = widget.addText(`🔥 ${peak}期間 ― 即完売注意`);
+    peakEl.font = Font.boldSystemFont(10);
+    peakEl.textColor = new Color(PEAK_COLOR);
+    widget.addSpacer(2);
+  }
 
   const timeEl = widget.addText(`${START_TIME} 予約開始`);
   timeEl.font = Font.systemFont(10);
