@@ -1,32 +1,32 @@
-// JAL特典航空券 予約開始日ウィジェット
+// JAL・ANA 特典航空券 予約開始日ウィジェット
 // Author: ファンタMAX
 // Updated: 2026-05-06
 // 実行環境: Scriptable (iOS)
 //
 // 【概要】
-//   今日のJST日付と、今日から360日後の日付（JAL特典航空券の予約可能最遠日）を
-//   ロック画面・ホーム画面ウィジェットに表示する。
-//   ウィジェットタップで特典航空券予約ページに直接ジャンプ。
+//   JAL（360日前 0:00）とANA（355日前 9:30）の特典航空券予約開始日を
+//   ロック画面・ホーム画面ウィジェットに並べて表示する。
+//   日付には曜日を付与。ボタンタップで各社アプリへ直接ジャンプ。
 
 // ── 設定定数 ──────────────────────────────────────────────
 
-const OFFSET_DAYS = 360;   // JAL特典航空券の予約開始日数（変更時はここだけ修正）
-const LABEL = "JAL予約開始日";
+// JAL: 搭乗360日前 0:00（JST）から予約可能
+const JAL_OFFSET_DAYS = 360;
+const JAL_START_TIME  = "0:00";
+const JAL_COLOR       = "#c8a951";  // JALゴールド
+// JALアプリ（App Store経由で起動）
+const JAL_URL = "https://apps.apple.com/jp/app/jal/id351785536";
 
-// 特典航空券予約ページURL（ウィジェットタップで開く）
-// ※ URLに含まれるセッショントークン（MESSAGE_AUTH等）は期限切れになることがあります。
-//    その場合は JAL公式サイトからログイン後のURLをコピーして差し替えてください。
-const BOOKING_URL =
-  "https://jallogin.jal.co.jp/contents/login?AUTH_TYPE=AUTH_THREEKEY_LOW&SITE_ID=co" +
-  "&AUTHENTICATED=http%3A%2F%2Fjallogin.jal.co.jp%2Fsso%2FInternalAuthoriEndpoint%2F" +
-  "%3Facr_values%3D4%26design%3DJL001N%26redirect_uri%3Dhttps%253A%252F%252Fwww121.jal.co.jp" +
-  "%252FJmbWeb%252FJR%252FDispatcher_ja.do%26state%3DVEVGT1J6MWhiVVU5JmJXVnRZbVZ5UW1GamEx" +
-  "VnliRDFhU0ZJd1kwaE5Oa3g1T1ROa00yTjFZVzFHYzB4dFRuWk1iWEIzVERKd2Qwd3ljR2hNTW5CMFdXaz" +
-  "VhR1F5Um5sYVF6RnJZakl3ZGxsdE9YWmhNbXgxV25rNFBRPT0mYldWdFltVnlVR0YwZEdWeWJqMU9VM2N5" +
-  "VEVSRmVreEVTVFU5JmJXVnRZbVZ5VUdGMGRHVnliakZPVTNjeVRFUkZlbHhFU1RVOT0mcGxhdGZvcm09c3" +
-  "BhJnNpZ25pbmdfYWxnb3JpdGhtPVJTMjU2JnNpZ25hdHVyZT1kZHFxcjNCSUNYTFJKWU1JTEdTMkhCOTdP" +
-  "MkQmcGFzc3dvcmRfYWdpbmdfY2hhaW5lZD1mYWxzZSZsb2dpbl9jaGFsbGVuZ2U9Rk0yVlhUZW9EcFMtQj" +
-  "ktWVdWbWE1aFF4TUNhYURQR3lVMVhVbnZ2SGhxdA&MESSAGE_AUTH=2kzZds50qrYovlX4vIgAsw%3D%3D";
+// ANA: 搭乗355日前 9:30（国内線）/ 9:00（国際線）から予約可能
+const ANA_OFFSET_DAYS = 355;
+const ANA_START_TIME  = "9:30";     // 国内線。国際線は9:00
+const ANA_COLOR       = "#1a6abf";  // ANAブルー
+// ANAアプリの予約画面（Universal Link）
+// ※ ANAアプリ未インストール時はブラウザでANAサイトが開きます
+const ANA_URL = "https://www.ana.co.jp/anaapp/domestic/reservation/";
+
+// 曜日ラベル（日曜=0 始まり）
+const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
 // ── 日付ユーティリティ ────────────────────────────────────
 
@@ -35,10 +35,9 @@ const BOOKING_URL =
  * 端末のタイムゾーン設定に依存しない実装。
  */
 function todayJST() {
-  const now = new Date();
+  const now   = new Date();
   const jstMs = now.getTime() + 9 * 60 * 60 * 1000;
-  const jst = new Date(jstMs);
-  // 時刻を0時にリセットしてUTC Dateとして保持
+  const jst   = new Date(jstMs);
   return new Date(Date.UTC(
     jst.getUTCFullYear(),
     jst.getUTCMonth(),
@@ -56,102 +55,141 @@ function addDays(date, days) {
   return d;
 }
 
-/** YYYY/MM/DD 形式（ゼロ埋めあり） */
+/** YYYY/MM/DD（曜） 形式 */
 function fmtFull(d) {
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const y   = d.getUTCFullYear();
+  const m   = String(d.getUTCMonth() + 1).padStart(2, "0");
   const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${y}/${m}/${day}`;
+  const w   = WEEKDAYS[d.getUTCDay()];
+  return `${y}/${m}/${day}（${w}）`;
 }
 
-/** M/D 形式（ゼロ埋めなし） */
+/** MM/DD（曜） 形式（年なし・ロック画面向け短縮） */
+function fmtMD(d) {
+  const m   = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const w   = WEEKDAYS[d.getUTCDay()];
+  return `${m}/${day}（${w}）`;
+}
+
+/** M/D（曜） 形式（ゼロ埋めなし・1行向け最短） */
 function fmtShort(d) {
-  return `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
+  const w = WEEKDAYS[d.getUTCDay()];
+  return `${d.getUTCMonth() + 1}/${d.getUTCDate()}（${w}）`;
 }
 
 // ── メイン処理 ────────────────────────────────────────────
 
-const today = todayJST();
-const future = addDays(today, OFFSET_DAYS);
-const family = config.widgetFamily;
+const today   = todayJST();
+const jalDate = addDays(today, JAL_OFFSET_DAYS);
+const anaDate = addDays(today, ANA_OFFSET_DAYS);
+const family  = config.widgetFamily;
 
 const widget = new ListWidget();
-// ウィジェット全体タップで予約ページを開く（全サイズ共通）
-widget.url = BOOKING_URL;
+// フォールバック: ウィジェット全体タップでJALアプリを開く
+widget.url = JAL_URL;
 
 // ── ウィジェットサイズ別レイアウト ───────────────────────
 
 if (family === "accessoryInline") {
-  // ロック画面・時計上の1行（テキストのみ、色指定はOS側）
-  widget.addText(`JAL: ${fmtShort(future)}`);
+  // ロック画面・時計上の1行（最短形式・曜日なし）
+  const j = `${jalDate.getUTCMonth() + 1}/${jalDate.getUTCDate()}`;
+  const a = `${anaDate.getUTCMonth() + 1}/${anaDate.getUTCDate()}`;
+  widget.addText(`JAL ${j} | ANA ${a}`);
 
 } else if (family === "accessoryCircular") {
-  // ロック画面・円形（月/日を中央表示）
+  // ロック画面・円形: スペース限られるためJALのみ
   widget.addSpacer();
-  const circularText = widget.addText(fmtShort(future));
-  circularText.font = Font.boldSystemFont(14);
-  circularText.centerAlignText();
+  const lbl = widget.addText("JAL");
+  lbl.font = Font.systemFont(9);
+  lbl.centerAlignText();
+  const dt = widget.addText(fmtShort(jalDate));
+  dt.font = Font.boldSystemFont(10);
+  dt.centerAlignText();
   widget.addSpacer();
 
 } else if (family === "accessoryRectangular") {
-  // ロック画面・四角枠【メイン推奨サイズ】
-  //   JAL予約開始日     ← 10pt
-  //   2027/05/01        ← 14pt bold
-  //   今日 5/6          ← 9pt, opacity 0.7
-  const labelEl = widget.addText(LABEL);
-  labelEl.font = Font.systemFont(10);
+  // ロック画面・四角枠（メイン推奨）
+  // JAL  05/01（金）  0:00
+  //      深夜0時ジャストに開始
+  // ANA  04/26（月）  9:30
+  //      9:30開始（国際線は9:00）
+  const jalLine = widget.addText(`JAL  ${fmtMD(jalDate)}  ${JAL_START_TIME}`);
+  jalLine.font = Font.boldSystemFont(11);
 
-  const futureDateEl = widget.addText(fmtFull(future));
-  futureDateEl.font = Font.boldSystemFont(14);
+  const jalNote = widget.addText("     深夜0時ジャストに開始");
+  jalNote.font = Font.systemFont(9);
+  jalNote.textOpacity = 0.6;
 
-  const todayEl = widget.addText(`今日 ${fmtShort(today)}`);
-  todayEl.font = Font.systemFont(9);
-  todayEl.textOpacity = 0.7;
+  widget.addSpacer(2);
+
+  const anaLine = widget.addText(`ANA  ${fmtMD(anaDate)}  ${ANA_START_TIME}`);
+  anaLine.font = Font.boldSystemFont(11);
+
+  const anaNote = widget.addText("     9:30開始（国際線は9:00）");
+  anaNote.font = Font.systemFont(9);
+  anaNote.textOpacity = 0.6;
 
 } else {
   // ホーム画面 small / medium / large
-  widget.backgroundColor = new Color("#1a1a2e");
+  widget.backgroundColor = new Color("#0d1117");
   widget.setPadding(14, 14, 14, 14);
 
-  // タイトル
-  const titleEl = widget.addText(LABEL);
-  titleEl.font = Font.boldSystemFont(12);
-  titleEl.textColor = Color.white();
+  const titleEl = widget.addText("特典航空券 予約開始日");
+  titleEl.font = Font.boldSystemFont(11);
+  titleEl.textColor = new Color("#888888");
 
-  widget.addSpacer(6);
+  widget.addSpacer(10);
 
-  // 今日の日付
-  const todayLabelEl = widget.addText("今日");
-  todayLabelEl.font = Font.systemFont(9);
-  todayLabelEl.textColor = new Color("#aaaaaa");
+  // JAL セクション
+  const jalLabelEl = widget.addText(`✈ JAL  360日前  ${JAL_START_TIME}スタート`);
+  jalLabelEl.font = Font.systemFont(9);
+  jalLabelEl.textColor = new Color(JAL_COLOR);
 
-  const todayDateEl = widget.addText(fmtFull(today));
-  todayDateEl.font = Font.systemFont(13);
-  todayDateEl.textColor = Color.white();
+  const jalDateEl = widget.addText(fmtFull(jalDate));
+  jalDateEl.font = Font.boldSystemFont(17);
+  jalDateEl.textColor = Color.white();
 
-  widget.addSpacer(6);
+  widget.addSpacer(8);
 
-  // 360日後の日付（予約可能最遠日）
-  const futureLabelEl = widget.addText(`+${OFFSET_DAYS}日後（予約可能最遠日）`);
-  futureLabelEl.font = Font.systemFont(9);
-  futureLabelEl.textColor = new Color("#aaaaaa");
+  // ANA セクション
+  const anaLabelEl = widget.addText(`✈ ANA  355日前  ${ANA_START_TIME}スタート（国内）`);
+  anaLabelEl.font = Font.systemFont(9);
+  anaLabelEl.textColor = new Color(ANA_COLOR);
 
-  const futureDateEl = widget.addText(fmtFull(future));
-  futureDateEl.font = Font.boldSystemFont(20);
-  futureDateEl.textColor = new Color("#ff6b6b");
+  const anaDateEl = widget.addText(fmtFull(anaDate));
+  anaDateEl.font = Font.boldSystemFont(17);
+  anaDateEl.textColor = Color.white();
 
   widget.addSpacer();
 
-  // 予約ボタン（ウィジェット全体タップと同じURLが開く）
-  const btnStack = widget.addStack();
-  btnStack.backgroundColor = new Color("#c8a951");
-  btnStack.cornerRadius = 6;
-  btnStack.setPadding(5, 10, 5, 10);
-  btnStack.centerAlignContent();
+  // ボタン横並び（JAL・ANA）
+  // ※ ScriptableがWidgetStack.urlに対応していれば個別タップが効く
+  //   未対応の場合は widget.url（JAL）が開く（フォールバック）
+  const btnRow = widget.addStack();
+  btnRow.layoutHorizontally();
 
-  const btnText = btnStack.addText("✈ 今すぐ予約");
-  btnText.font = Font.boldSystemFont(11);
-  btnText.textColor = Color.white();
+  const jalBtn = btnRow.addStack();
+  jalBtn.url = JAL_URL;
+  jalBtn.backgroundColor = new Color(JAL_COLOR);
+  jalBtn.cornerRadius = 6;
+  jalBtn.setPadding(5, 10, 5, 10);
+  jalBtn.centerAlignContent();
+  const jalBtnText = jalBtn.addText("✈ JAL予約");
+  jalBtnText.font = Font.boldSystemFont(10);
+  jalBtnText.textColor = Color.white();
+
+  btnRow.addSpacer(8);
+
+  const anaBtn = btnRow.addStack();
+  anaBtn.url = ANA_URL;
+  anaBtn.backgroundColor = new Color(ANA_COLOR);
+  anaBtn.cornerRadius = 6;
+  anaBtn.setPadding(5, 10, 5, 10);
+  anaBtn.centerAlignContent();
+  const anaBtnText = anaBtn.addText("✈ ANA予約");
+  anaBtnText.font = Font.boldSystemFont(10);
+  anaBtnText.textColor = Color.white();
 }
 
 // ── 実行モード分岐 ────────────────────────────────────────
