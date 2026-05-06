@@ -103,7 +103,7 @@ if (family === "accessoryInline") {
 
   const timeStr = peak
     ? `国内 ${START_TIME_DOMESTIC} / 国際 ${START_TIME_INTL}  🔥 ${peak}`
-    : `国内 ${START_TIME_DOMESTIC} / 国際 ${START_TIME_INTL} 予約開始`;
+    : `国内 ${START_TIME_DOMESTIC} / 国際 ${START_TIME_INTL}`;
   const timeEl = widget.addText(timeStr);
   timeEl.font = Font.systemFont(9);
   timeEl.textOpacity = 0.65;

@@ -188,9 +188,9 @@ if (family === "accessoryInline") {
   jalCard.addSpacer(6);
 
   const jalDtEl = jalCard.addText(fmt(jalDate));
-  jalDtEl.font = Font.boldSystemFont(20);
+  jalDtEl.font = Font.boldSystemFont(16);
   jalDtEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
-  jalDtEl.minimumScaleFactor = 0.7;
+  jalDtEl.minimumScaleFactor = 0.6;
 
   if (jalPeak) {
     jalCard.addSpacer(3);
@@ -222,9 +222,9 @@ if (family === "accessoryInline") {
   anaCard.addSpacer(6);
 
   const anaDtEl = anaCard.addText(fmt(anaDate));
-  anaDtEl.font = Font.boldSystemFont(20);
+  anaDtEl.font = Font.boldSystemFont(16);
   anaDtEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
-  anaDtEl.minimumScaleFactor = 0.7;
+  anaDtEl.minimumScaleFactor = 0.6;
 
   if (anaPeak) {
     anaCard.addSpacer(3);
