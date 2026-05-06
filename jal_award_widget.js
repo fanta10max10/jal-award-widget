@@ -2,28 +2,22 @@
 // Author: ファンタMAX
 // Updated: 2026-05-06
 // 実行環境: Scriptable (iOS)
-//
-// 【概要】
-//   JAL特典航空券の予約開始日（今日 +360日・曜日付き）を表示する。
-//   ウィジェットタップでJALアプリを起動。
 
 // ── 設定定数 ──────────────────────────────────────────────
 
 const OFFSET_DAYS  = 360;
-const START_TIME   = "0:00";       // 国内・国際ともに深夜0時
-const LABEL        = "JAL予約開始日";
-const ACCENT_COLOR = "#e60012";    // JALレッド
-const BG_COLOR     = "#1a0005";    // ダーク赤系背景（ホーム画面用）
+const START_TIME   = "0:00";
+const LABEL        = "JAL 360日先の搭乗日";
+const ACCENT_COLOR = "#e60012";   // JALレッド
+const BG_COLOR     = "#1a0005";   // ダーク赤系背景（ホーム画面用）
 
-// JALアプリ（App Store経由で起動。アプリ導入済みならアプリが開く）
+// JALアプリ（App Store経由。アプリ導入済みならアプリが開く）
 const APP_URL = "https://apps.apple.com/jp/app/jal/id351785536";
 
-// 曜日ラベル（日曜=0）
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
 // ── 日付ユーティリティ ────────────────────────────────────
 
-/** JST（UTC+9）基準で「今日」の0時を返す。端末タイムゾーン非依存。 */
 function todayJST() {
   const now   = new Date();
   const jstMs = now.getTime() + 9 * 60 * 60 * 1000;
@@ -31,7 +25,6 @@ function todayJST() {
   return new Date(Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate()));
 }
 
-/** DST誤差を避けるため setUTCDate で加算。 */
 function addDays(date, days) {
   const d = new Date(date);
   d.setUTCDate(d.getUTCDate() + days);
@@ -46,14 +39,14 @@ function fmtFull(d) {
   return `${y}/${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
 }
 
-/** MM/DD（曜）―年なし・ロック画面向け */
+/** MM/DD（曜）―年なし */
 function fmtMD(d) {
   const m   = String(d.getUTCMonth() + 1).padStart(2, "0");
   const day = String(d.getUTCDate()).padStart(2, "0");
   return `${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
 }
 
-/** M/D（曜）―ゼロ埋めなし・1行最短 */
+/** M/D（曜）―最短 */
 function fmtShort(d) {
   return `${d.getUTCMonth() + 1}/${d.getUTCDate()}（${WEEKDAYS[d.getUTCDay()]}）`;
 }
@@ -63,17 +56,15 @@ function fmtShort(d) {
 const target = addDays(todayJST(), OFFSET_DAYS);
 const family = config.widgetFamily;
 
-const widget  = new ListWidget();
-widget.url    = APP_URL;  // ウィジェット全体タップでJALアプリを開く
+const widget = new ListWidget();
+widget.url   = APP_URL;
 
 // ── サイズ別レイアウト ────────────────────────────────────
 
 if (family === "accessoryInline") {
-  // 時計上の1行
-  widget.addText(`JAL ${fmtShort(target)}  ${START_TIME}`);
+  widget.addText(`JAL ${fmtShort(target)}  ${START_TIME}予約開始`);
 
 } else if (family === "accessoryCircular") {
-  // 円形
   widget.addSpacer();
   const lbl = widget.addText("JAL");
   lbl.font = Font.boldSystemFont(9);
@@ -84,15 +75,17 @@ if (family === "accessoryInline") {
   widget.addSpacer();
 
 } else if (family === "accessoryRectangular") {
-  // ロック画面・四角枠（推奨）
-  const lblEl = widget.addText(LABEL);
+  // ラベルと日付を同一行に
+  const row = widget.addStack();
+  row.layoutHorizontally();
+  row.centerAlignContent();
+  const lblEl = row.addText(LABEL + "  ");
   lblEl.font = Font.systemFont(10);
+  const dtEl = row.addText(fmtMD(target));
+  dtEl.font = Font.boldSystemFont(13);
 
-  const dtEl = widget.addText(fmtMD(target));
-  dtEl.font = Font.boldSystemFont(16);
-
-  const timeEl = widget.addText(`${START_TIME} スタート（国内・国際とも）`);
-  timeEl.font = Font.systemFont(9);
+  const timeEl = widget.addText(`${START_TIME} 予約開始`);
+  timeEl.font = Font.systemFont(10);
   timeEl.textOpacity = 0.65;
 
 } else {
@@ -112,13 +105,12 @@ if (family === "accessoryInline") {
 
   widget.addSpacer(4);
 
-  const timeEl = widget.addText(`${START_TIME} スタート（国内・国際とも）`);
+  const timeEl = widget.addText(`${START_TIME} 予約開始`);
   timeEl.font = Font.systemFont(10);
   timeEl.textColor = new Color("#aaaaaa");
 
   widget.addSpacer();
 
-  // 予約ボタン
   const btn = widget.addStack();
   btn.url = APP_URL;
   btn.backgroundColor = new Color(ACCENT_COLOR);
