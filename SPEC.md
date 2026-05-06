@@ -92,7 +92,7 @@ iPhoneのロック画面とホーム画面に、**JAL と ANA 両社の特典航
 
 | 社 | URL | 備考 |
 |---|---|---|
-| JAL | `https://apps.apple.com/jp/app/jal/id351785536` | App Store経由でJALアプリ起動 |
+| JAL | `https://www.jal.co.jp/appli/121/link/ios/index.html` | Universal Link（インストール済みならJALアプリ起動） |
 | ANA | `https://www.ana.co.jp/anaapp/domestic/reservation/` | Universal Linkでアプリ予約画面へ |
 
 ---
@@ -159,13 +159,14 @@ JAL 5/1 | ANA 4/26
 
 ```
 JAL予約開始日ウィジェット/
-├── SPEC.md              ← この仕様書
-├── jal_award_widget.js  ← JAL専用ウィジェット（赤テーマ）
-├── ana_award_widget.js  ← ANA専用ウィジェット（青テーマ）
-└── README.md            ← セットアップ手順（ユーザー向け）
+├── SPEC.md                  ← この仕様書
+├── jal_award_widget.js      ← JAL専用ウィジェット（赤テーマ）
+├── ana_award_widget.js      ← ANA専用ウィジェット（青テーマ）
+├── combined_award_widget.js ← JAL・ANA合体ウィジェット（ロック画面1枠節約用）
+└── README.md                ← セットアップ手順（ユーザー向け）
 ```
 
-JAL・ANA を別スクリプトとして分割することで、小サイズのウィジェットを2つ並べてロック画面・ホーム画面をコンパクトに使えるようにしている。
+JAL・ANA を別スクリプトとして分割することで、小サイズのウィジェットを2つ並べてロック画面・ホーム画面をコンパクトに使えるようにしている。合体版はロック画面の枠を1つ節約したい場合に使用。
 
 ---
 
@@ -268,6 +269,9 @@ const WEEKDAYS = ["日","月","火","水","木","金","土"];
 | 1.1 | 2026-05-06 | 予約ページクイックアクセス機能追加（3.6節・5.4節）、実装完了 |
 | 1.2 | 2026-05-06 | ANA追加（355日前・9:30）、曜日表示追加、今日の日付を削除、アプリボタン2社横並び対応 |
 | 1.3 | 2026-05-06 | JAL・ANA を別ファイルに分割（jal_award_widget.js / ana_award_widget.js）、JALカラーをゴールド→レッド（#e60012）に変更、ANA国際線開始時刻（9:00）を明示 |
+| 1.4 | 2026-05-06 | combined_award_widget.js 追加（合体版）、ホーム画面をカードデザインに刷新 |
+| 1.5 | 2026-05-06 | JAL URLをUniversal Linkに変更（https://www.jal.co.jp/appli/121/link/ios/index.html） |
+| 1.6 | 2026-05-06 | 合体版: 日付フォーマットをYYYY/MM/DD（曜）に変更、ANAサブタイトルに国際線時刻追加、ANA非繁忙期ロック画面から「予約開始」削除 |
 
 ---
 
