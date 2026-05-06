@@ -153,6 +153,7 @@ if (family === "accessoryInline") {
 
   const cards = widget.addStack();
   cards.layoutHorizontally();
+  cards.spacing = 8;
 
   // ── ヘルパー: カード内のボタンを作る ──────────────────
   function addBtn(parent, label, color, url) {
@@ -201,9 +202,6 @@ if (family === "accessoryInline") {
   jalCard.addSpacer();
 
   addBtn(jalCard, "✈ 予約", new Color(JAL_COLOR), JAL_URL);
-
-  // カード間スペース
-  cards.addSpacer(8);
 
   // ── ANA カード（ダーク紺） ──────────────────────────
   const anaCard = cards.addStack();
