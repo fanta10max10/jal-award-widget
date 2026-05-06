@@ -39,12 +39,12 @@ function addDays(date, days) {
   return d;
 }
 
-/** YY/M/D（曜） */
+/** YYYY/MM/DD（曜） */
 function fmt(d) {
-  const yy  = String(d.getUTCFullYear()).slice(-2);
-  const m   = d.getUTCMonth() + 1;
-  const day = d.getUTCDate();
-  return `${yy}/${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
+  const yyyy = d.getUTCFullYear();
+  const mm   = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getUTCDate()).padStart(2, '0');
+  return `${yyyy}/${mm}/${dd}（${WEEKDAYS[d.getUTCDay()]}）`;
 }
 
 /** M/D（曜）―最短 */
@@ -215,7 +215,7 @@ if (family === "accessoryInline") {
   anaAirline.font = Font.boldSystemFont(13);
   anaAirline.textColor = new Color(ANA_COLOR);
 
-  const anaSub = anaCard.addText(`355日先  ${ANA_TIME_DOMESTIC}`);
+  const anaSub = anaCard.addText(`355日先  ${ANA_TIME_DOMESTIC}(国内)/${ANA_TIME_INTL}(国際)`);
   anaSub.font = Font.systemFont(9);
   anaSub.textColor = new Color("#888888");
 

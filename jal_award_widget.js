@@ -50,12 +50,12 @@ function addDays(date, days) {
   return d;
 }
 
-/** YY/M/D（曜） */
+/** YYYY/MM/DD（曜） */
 function fmtFull(d) {
-  const yy  = String(d.getUTCFullYear()).slice(-2);
-  const m   = d.getUTCMonth() + 1;
-  const day = d.getUTCDate();
-  return `${yy}/${m}/${day}（${WEEKDAYS[d.getUTCDay()]}）`;
+  const yyyy = d.getUTCFullYear();
+  const mm   = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getUTCDate()).padStart(2, '0');
+  return `${yyyy}/${mm}/${dd}（${WEEKDAYS[d.getUTCDay()]}）`;
 }
 
 /** YY/M/D（曜）―ロック画面向け（fmtFullと同形式） */
