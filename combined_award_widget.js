@@ -153,34 +153,38 @@ if (family === "accessoryInline") {
 
   // タイトル行
   const titleEl = widget.addText("特典航空券 予約開始日");
-  titleEl.font = Font.boldSystemFont(10);
+  titleEl.font = Font.systemFont(9);
   titleEl.textColor = new Color("#888888");
 
-  widget.addSpacer(6);
+  widget.addSpacer(4);
 
   // ラベル行（JAL左 / ANA右）
   const labelRow = widget.addStack();
   labelRow.layoutHorizontally();
   const jalLblEl = labelRow.addText(`✈ JAL  360日先  ${JAL_TIME}`);
-  jalLblEl.font = Font.systemFont(9);
+  jalLblEl.font = Font.systemFont(10);
   jalLblEl.textColor = new Color(JAL_COLOR);
   labelRow.addSpacer();
   const anaLblEl = labelRow.addText(`✈ ANA  355日先  ${ANA_TIME_DOMESTIC}`);
-  anaLblEl.font = Font.systemFont(9);
+  anaLblEl.font = Font.systemFont(10);
   anaLblEl.textColor = new Color(ANA_COLOR);
   anaLblEl.rightAlignText();
+
+  widget.addSpacer(2);
 
   // 日付行（JAL左 / ANA右）
   const dateRow = widget.addStack();
   dateRow.layoutHorizontally();
   const jalDtEl = dateRow.addText(fmt(jalDate));
-  jalDtEl.font = Font.boldSystemFont(17);
+  jalDtEl.font = Font.boldSystemFont(22);
   jalDtEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
   dateRow.addSpacer();
   const anaDtEl = dateRow.addText(fmt(anaDate));
-  anaDtEl.font = Font.boldSystemFont(17);
+  anaDtEl.font = Font.boldSystemFont(22);
   anaDtEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
   anaDtEl.rightAlignText();
+
+  widget.addSpacer(2);
 
   // 繁忙期行（どちらかあれば表示）
   if (jalPeak || anaPeak) {
@@ -188,19 +192,20 @@ if (family === "accessoryInline") {
     peakRow.layoutHorizontally();
     if (jalPeak) {
       const p = peakRow.addText(`🔥 ${jalPeak} 即完売`);
-      p.font = Font.boldSystemFont(9);
+      p.font = Font.boldSystemFont(10);
       p.textColor = new Color(PEAK_COLOR);
     }
     peakRow.addSpacer();
     if (anaPeak) {
       const p = peakRow.addText(`🔥 ${anaPeak} 即完売`);
-      p.font = Font.boldSystemFont(9);
+      p.font = Font.boldSystemFont(10);
       p.textColor = new Color(PEAK_COLOR);
       p.rightAlignText();
     }
+    widget.addSpacer(6);
+  } else {
+    widget.addSpacer(8);
   }
-
-  widget.addSpacer();  // コンテンツとボタンの間を詰める
 
   // ボタン行（JAL左下 / ANA右下）
   const btnRow = widget.addStack();
