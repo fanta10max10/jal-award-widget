@@ -13,7 +13,7 @@
 const JAL_OFFSET = 360;
 const JAL_TIME   = "0:00";
 const JAL_COLOR  = "#e60012";   // JALレッド
-const JAL_URL    = "https://apps.apple.com/jp/app/jal/id351785536";
+const JAL_URL    = "https://www.jal.co.jp/appli/121/link/ios/index.html";
 
 const ANA_OFFSET          = 355;
 const ANA_TIME_DOMESTIC   = "9:30";
@@ -147,89 +147,97 @@ if (family === "accessoryInline") {
 
 } else {
   // ホーム画面 small / medium / large
-  // 行ごとに横スタック → addSpacer() でJAL左端・ANA右端に固定
-  widget.backgroundColor = new Color("#0d1117");
-  widget.setPadding(12, 12, 12, 12);
+  // JAL・ANA を色付きカードに分けて横並び
+  widget.backgroundColor = new Color("#080810");
+  widget.setPadding(10, 10, 10, 10);
 
-  // タイトル行
-  const titleEl = widget.addText("特典航空券 予約開始日");
-  titleEl.font = Font.systemFont(9);
-  titleEl.textColor = new Color("#888888");
+  const cards = widget.addStack();
+  cards.layoutHorizontally();
 
-  widget.addSpacer(4);
-
-  // ラベル行（JAL左 / ANA右）
-  const labelRow = widget.addStack();
-  labelRow.layoutHorizontally();
-  const jalLblEl = labelRow.addText(`✈ JAL  360日先  ${JAL_TIME}`);
-  jalLblEl.font = Font.systemFont(10);
-  jalLblEl.textColor = new Color(JAL_COLOR);
-  labelRow.addSpacer();
-  const anaLblEl = labelRow.addText(`✈ ANA  355日先  ${ANA_TIME_DOMESTIC}`);
-  anaLblEl.font = Font.systemFont(10);
-  anaLblEl.textColor = new Color(ANA_COLOR);
-  anaLblEl.rightAlignText();
-
-  widget.addSpacer(2);
-
-  // 日付行（JAL左 / ANA右）
-  const dateRow = widget.addStack();
-  dateRow.layoutHorizontally();
-  const jalDtEl = dateRow.addText(fmt(jalDate));
-  jalDtEl.font = Font.boldSystemFont(22);
-  jalDtEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
-  dateRow.addSpacer();
-  const anaDtEl = dateRow.addText(fmt(anaDate));
-  anaDtEl.font = Font.boldSystemFont(22);
-  anaDtEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
-  anaDtEl.rightAlignText();
-
-  widget.addSpacer(2);
-
-  // 繁忙期行（どちらかあれば表示）
-  if (jalPeak || anaPeak) {
-    const peakRow = widget.addStack();
-    peakRow.layoutHorizontally();
-    if (jalPeak) {
-      const p = peakRow.addText(`🔥 ${jalPeak}期間`);
-      p.font = Font.boldSystemFont(10);
-      p.textColor = new Color(PEAK_COLOR);
-    }
-    peakRow.addSpacer();
-    if (anaPeak) {
-      const p = peakRow.addText(`🔥 ${anaPeak}期間`);
-      p.font = Font.boldSystemFont(10);
-      p.textColor = new Color(PEAK_COLOR);
-      p.rightAlignText();
-    }
-    widget.addSpacer(6);
-  } else {
-    widget.addSpacer(8);
+  // ── ヘルパー: カード内のボタンを作る ──────────────────
+  function addBtn(parent, label, color, url) {
+    const btn = parent.addStack();
+    btn.url = url;
+    btn.backgroundColor = color;
+    btn.cornerRadius = 6;
+    btn.setPadding(5, 0, 5, 0);
+    btn.centerAlignContent();
+    const t = btn.addText(label);
+    t.font = Font.boldSystemFont(11);
+    t.textColor = Color.white();
+    t.centerAlignText();
   }
 
-  // ボタン行（JAL左下 / ANA右下）
-  const btnRow = widget.addStack();
-  btnRow.layoutHorizontally();
+  // ── JAL カード（ダーク赤） ──────────────────────────
+  const jalCard = cards.addStack();
+  jalCard.layoutVertically();
+  jalCard.backgroundColor = new Color("#1e0005");
+  jalCard.cornerRadius = 10;
+  jalCard.setPadding(10, 10, 10, 10);
+  jalCard.url = JAL_URL;
 
-  const jalBtn = btnRow.addStack();
-  jalBtn.url = JAL_URL;
-  jalBtn.backgroundColor = new Color(JAL_COLOR);
-  jalBtn.cornerRadius = 6;
-  jalBtn.setPadding(5, 10, 5, 10);
-  const jalBtnText = jalBtn.addText("✈ JAL予約");
-  jalBtnText.font = Font.boldSystemFont(10);
-  jalBtnText.textColor = Color.white();
+  const jalAirline = jalCard.addText("JAL");
+  jalAirline.font = Font.boldSystemFont(13);
+  jalAirline.textColor = new Color(JAL_COLOR);
 
-  btnRow.addSpacer();  // JAL左・ANA右に押し広げ
+  const jalSub = jalCard.addText(`360日先  ${JAL_TIME}`);
+  jalSub.font = Font.systemFont(9);
+  jalSub.textColor = new Color("#888888");
 
-  const anaBtn = btnRow.addStack();
-  anaBtn.url = ANA_URL;
-  anaBtn.backgroundColor = new Color(ANA_COLOR);
-  anaBtn.cornerRadius = 6;
-  anaBtn.setPadding(5, 10, 5, 10);
-  const anaBtnText = anaBtn.addText("✈ ANA予約");
-  anaBtnText.font = Font.boldSystemFont(10);
-  anaBtnText.textColor = Color.white();
+  jalCard.addSpacer(6);
+
+  const jalDtEl = jalCard.addText(fmt(jalDate));
+  jalDtEl.font = Font.boldSystemFont(20);
+  jalDtEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
+  jalDtEl.minimumScaleFactor = 0.7;
+
+  if (jalPeak) {
+    jalCard.addSpacer(3);
+    const p = jalCard.addText(`🔥 ${jalPeak}期間`);
+    p.font = Font.boldSystemFont(10);
+    p.textColor = new Color(PEAK_COLOR);
+  }
+
+  jalCard.addSpacer();
+
+  addBtn(jalCard, "✈ 予約", new Color(JAL_COLOR), JAL_URL);
+
+  // カード間スペース
+  cards.addSpacer(8);
+
+  // ── ANA カード（ダーク紺） ──────────────────────────
+  const anaCard = cards.addStack();
+  anaCard.layoutVertically();
+  anaCard.backgroundColor = new Color("#00112a");
+  anaCard.cornerRadius = 10;
+  anaCard.setPadding(10, 10, 10, 10);
+  anaCard.url = ANA_URL;
+
+  const anaAirline = anaCard.addText("ANA");
+  anaAirline.font = Font.boldSystemFont(13);
+  anaAirline.textColor = new Color(ANA_COLOR);
+
+  const anaSub = anaCard.addText(`355日先  ${ANA_TIME_DOMESTIC}`);
+  anaSub.font = Font.systemFont(9);
+  anaSub.textColor = new Color("#888888");
+
+  anaCard.addSpacer(6);
+
+  const anaDtEl = anaCard.addText(fmt(anaDate));
+  anaDtEl.font = Font.boldSystemFont(20);
+  anaDtEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
+  anaDtEl.minimumScaleFactor = 0.7;
+
+  if (anaPeak) {
+    anaCard.addSpacer(3);
+    const p = anaCard.addText(`🔥 ${anaPeak}期間`);
+    p.font = Font.boldSystemFont(10);
+    p.textColor = new Color(PEAK_COLOR);
+  }
+
+  anaCard.addSpacer();
+
+  addBtn(anaCard, "✈ 予約", new Color(ANA_COLOR), ANA_URL);
 }
 
 // ── 実行モード分岐 ────────────────────────────────────────

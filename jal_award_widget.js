@@ -12,7 +12,7 @@ const ACCENT_COLOR = "#e60012";   // JALレッド
 const BG_COLOR     = "#1a0005";   // ダーク赤系背景（ホーム画面用）
 
 // JALアプリ（App Store経由。アプリ導入済みならアプリが開く）
-const APP_URL = "https://apps.apple.com/jp/app/jal/id351785536";
+const APP_URL = "https://www.jal.co.jp/appli/121/link/ios/index.html";
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
