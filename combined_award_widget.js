@@ -149,7 +149,7 @@ if (family === "accessoryInline") {
   // ホーム画面 small / medium / large
   // JAL・ANA を色付きカードに分けて横並び
   widget.backgroundColor = new Color("#080810");
-  widget.setPadding(10, 0, 10, 0);
+  widget.setPadding(10, 8, 10, 8);
 
   const cards = widget.addStack();
   cards.layoutHorizontally();
