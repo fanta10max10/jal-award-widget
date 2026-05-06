@@ -147,41 +147,66 @@ if (family === "accessoryInline") {
 
 } else {
   // ホーム画面 small / medium / large
-  // JAL左・ANA右の2カラム構成。ボタンは各カラムの底に配置。
+  // 行ごとに横スタック → addSpacer() でJAL左端・ANA右端に固定
   widget.backgroundColor = new Color("#0d1117");
-  widget.setPadding(14, 14, 14, 14);
+  widget.setPadding(12, 12, 12, 12);
 
+  // タイトル行
   const titleEl = widget.addText("特典航空券 予約開始日");
-  titleEl.font = Font.boldSystemFont(11);
+  titleEl.font = Font.boldSystemFont(10);
   titleEl.textColor = new Color("#888888");
 
-  widget.addSpacer(8);
+  widget.addSpacer(6);
 
-  // ── 2カラム（左: JAL / 右: ANA）──────────────────────
-  const mainRow = widget.addStack();
-  mainRow.layoutHorizontally();
+  // ラベル行（JAL左 / ANA右）
+  const labelRow = widget.addStack();
+  labelRow.layoutHorizontally();
+  const jalLblEl = labelRow.addText(`✈ JAL  360日先  ${JAL_TIME}`);
+  jalLblEl.font = Font.systemFont(9);
+  jalLblEl.textColor = new Color(JAL_COLOR);
+  labelRow.addSpacer();
+  const anaLblEl = labelRow.addText(`✈ ANA  355日先  ${ANA_TIME_DOMESTIC}`);
+  anaLblEl.font = Font.systemFont(9);
+  anaLblEl.textColor = new Color(ANA_COLOR);
+  anaLblEl.rightAlignText();
 
-  // ── JAL カラム（左寄せ）────────────────────────────
-  const jalCol = mainRow.addStack();
-  jalCol.layoutVertically();
+  // 日付行（JAL左 / ANA右）
+  const dateRow = widget.addStack();
+  dateRow.layoutHorizontally();
+  const jalDtEl = dateRow.addText(fmt(jalDate));
+  jalDtEl.font = Font.boldSystemFont(17);
+  jalDtEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
+  dateRow.addSpacer();
+  const anaDtEl = dateRow.addText(fmt(anaDate));
+  anaDtEl.font = Font.boldSystemFont(17);
+  anaDtEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
+  anaDtEl.rightAlignText();
 
-  const jalLabelEl = jalCol.addText(`✈ JAL  360日先  ${JAL_TIME}`);
-  jalLabelEl.font = Font.systemFont(9);
-  jalLabelEl.textColor = new Color(JAL_COLOR);
-
-  const jalDateEl = jalCol.addText(fmt(jalDate));
-  jalDateEl.font = Font.boldSystemFont(17);
-  jalDateEl.textColor = jalPeak ? new Color(PEAK_COLOR) : Color.white();
-
-  if (jalPeak) {
-    const p = jalCol.addText(`🔥 ${jalPeak} 即完売注意`);
-    p.font = Font.boldSystemFont(9);
-    p.textColor = new Color(PEAK_COLOR);
+  // 繁忙期行（どちらかあれば表示）
+  if (jalPeak || anaPeak) {
+    const peakRow = widget.addStack();
+    peakRow.layoutHorizontally();
+    if (jalPeak) {
+      const p = peakRow.addText(`🔥 ${jalPeak} 即完売`);
+      p.font = Font.boldSystemFont(9);
+      p.textColor = new Color(PEAK_COLOR);
+    }
+    peakRow.addSpacer();
+    if (anaPeak) {
+      const p = peakRow.addText(`🔥 ${anaPeak} 即完売`);
+      p.font = Font.boldSystemFont(9);
+      p.textColor = new Color(PEAK_COLOR);
+      p.rightAlignText();
+    }
   }
 
-  jalCol.addSpacer();  // ボタンを底に押し下げ
+  widget.addSpacer();  // コンテンツとボタンの間を詰める
 
-  const jalBtn = jalCol.addStack();
+  // ボタン行（JAL左下 / ANA右下）
+  const btnRow = widget.addStack();
+  btnRow.layoutHorizontally();
+
+  const jalBtn = btnRow.addStack();
   jalBtn.url = JAL_URL;
   jalBtn.backgroundColor = new Color(JAL_COLOR);
   jalBtn.cornerRadius = 6;
@@ -190,29 +215,9 @@ if (family === "accessoryInline") {
   jalBtnText.font = Font.boldSystemFont(10);
   jalBtnText.textColor = Color.white();
 
-  mainRow.addSpacer(12);  // カラム間スペース
+  btnRow.addSpacer();  // JAL左・ANA右に押し広げ
 
-  // ── ANA カラム（右寄せ）────────────────────────────
-  const anaCol = mainRow.addStack();
-  anaCol.layoutVertically();
-
-  const anaLabelEl = anaCol.addText(`✈ ANA  355日先  ${ANA_TIME_DOMESTIC}`);
-  anaLabelEl.font = Font.systemFont(9);
-  anaLabelEl.textColor = new Color(ANA_COLOR);
-
-  const anaDateEl = anaCol.addText(fmt(anaDate));
-  anaDateEl.font = Font.boldSystemFont(17);
-  anaDateEl.textColor = anaPeak ? new Color(PEAK_COLOR) : Color.white();
-
-  if (anaPeak) {
-    const p = anaCol.addText(`🔥 ${anaPeak} 即完売注意`);
-    p.font = Font.boldSystemFont(9);
-    p.textColor = new Color(PEAK_COLOR);
-  }
-
-  anaCol.addSpacer();  // ボタンを底に押し下げ
-
-  const anaBtn = anaCol.addStack();
+  const anaBtn = btnRow.addStack();
   anaBtn.url = ANA_URL;
   anaBtn.backgroundColor = new Color(ANA_COLOR);
   anaBtn.cornerRadius = 6;
