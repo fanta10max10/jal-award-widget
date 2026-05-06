@@ -198,7 +198,7 @@ if (family === "accessoryInline") {
     p.textColor = new Color(PEAK_COLOR);
   }
 
-  jalCard.addSpacer();
+  jalCard.addSpacer(8);
 
   addBtn(jalCard, "✈ 予約", new Color(JAL_COLOR), JAL_URL);
 
@@ -235,7 +235,7 @@ if (family === "accessoryInline") {
     p.textColor = new Color(PEAK_COLOR);
   }
 
-  anaCard.addSpacer();
+  anaCard.addSpacer(8);
 
   addBtn(anaCard, "✈ 予約", new Color(ANA_COLOR), ANA_URL);
 }
